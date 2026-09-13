@@ -17,7 +17,7 @@ df_boston = pd.read_sql("""
 
 
 # Part 1 - offices with zero employees
-df_empty_offices = pd.read_sql("""
+df_zero_emp = pd.read_sql("""
     SELECT
         o.officeCode,
         o.city,
@@ -141,7 +141,7 @@ df_customers = pd.read_sql("""
     GROUP BY
         o.officeCode,
         o.city
-    ORDER BY n_customers DESC;
+    ORDER BY o.officeCode ASC;
 """, conn)
 
 
@@ -170,8 +170,8 @@ df_under_20 = pd.read_sql("""
         GROUP BY od2.productCode
         HAVING COUNT(DISTINCT ord2.customerNumber) < 20
     )
-    ORDER BY e.firstName, e.lastName;
-""" , conn)
+    ORDER BY e.lastName ASC;
+""", conn)
 
 
 conn.close()
