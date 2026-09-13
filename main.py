@@ -1,19 +1,14 @@
 import sqlite3
 import pandas as pd
 
-# Connect to database
 conn = sqlite3.connect("data.sqlite")
 
 
-# ============================================================
-# PART 1: JOIN AND FILTER
-# ============================================================
-
+# Part 1
 df_boston = pd.read_sql("""
     SELECT
         e.firstName,
-        e.lastName,
-        e.jobTitle
+        e.lastName
     FROM employees AS e
     JOIN offices AS o
         ON e.officeCode = o.officeCode
@@ -21,6 +16,7 @@ df_boston = pd.read_sql("""
 """, conn)
 
 
+# Part 1 - offices with zero employees
 df_empty_offices = pd.read_sql("""
     SELECT
         o.officeCode,
@@ -36,10 +32,7 @@ df_empty_offices = pd.read_sql("""
 """, conn)
 
 
-# ============================================================
-# PART 2: TYPE OF JOIN
-# ============================================================
-
+# Part 2
 df_employee = pd.read_sql("""
     SELECT
         e.firstName,
@@ -55,7 +48,7 @@ df_employee = pd.read_sql("""
 """, conn)
 
 
-df_no_orders = pd.read_sql("""
+df_contacts = pd.read_sql("""
     SELECT
         c.contactFirstName,
         c.contactLastName,
@@ -69,10 +62,7 @@ df_no_orders = pd.read_sql("""
 """, conn)
 
 
-# ============================================================
-# PART 3: BUILT-IN FUNCTION
-# ============================================================
-
+# Part 3
 df_payment = pd.read_sql("""
     SELECT
         c.contactFirstName,
@@ -86,10 +76,7 @@ df_payment = pd.read_sql("""
 """, conn)
 
 
-# ============================================================
-# PART 4: JOINING AND GROUPING
-# ============================================================
-
+# Part 4
 df_credit = pd.read_sql("""
     SELECT
         e.employeeNumber,
@@ -108,7 +95,7 @@ df_credit = pd.read_sql("""
 """, conn)
 
 
-df_products = pd.read_sql("""
+df_product_sold = pd.read_sql("""
     SELECT
         p.productName,
         COUNT(od.orderNumber) AS numorders,
@@ -123,10 +110,7 @@ df_products = pd.read_sql("""
 """, conn)
 
 
-# ============================================================
-# PART 5: MULTIPLE JOINS
-# ============================================================
-
+# Part 5
 df_total_customers = pd.read_sql("""
     SELECT
         p.productName,
@@ -144,7 +128,7 @@ df_total_customers = pd.read_sql("""
 """, conn)
 
 
-df_customers_office = pd.read_sql("""
+df_customers = pd.read_sql("""
     SELECT
         COUNT(c.customerNumber) AS n_customers,
         o.officeCode,
@@ -156,14 +140,12 @@ df_customers_office = pd.read_sql("""
         ON e.employeeNumber = c.salesRepEmployeeNumber
     GROUP BY
         o.officeCode,
-        o.city;
+        o.city
+    ORDER BY n_customers DESC;
 """, conn)
 
 
-# ============================================================
-# PART 6: SUBQUERY
-# ============================================================
-
+# Part 6
 df_under_20 = pd.read_sql("""
     SELECT DISTINCT
         e.employeeNumber,
@@ -187,9 +169,9 @@ df_under_20 = pd.read_sql("""
             ON od2.orderNumber = ord2.orderNumber
         GROUP BY od2.productCode
         HAVING COUNT(DISTINCT ord2.customerNumber) < 20
-    );
-""", conn)
+    )
+    ORDER BY e.firstName, e.lastName;
+""" , conn)
 
 
-# Close connection
 conn.close()
